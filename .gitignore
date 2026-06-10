@@ -1,0 +1,18 @@
+# Virtual environments
+venv/
+env/
+__pycache__/
+*.pyc
+*.pem
+*.egg-info/
+dist/
+build/
+.env
+
+# Compiled C binaries
+src/memory_vuln
+src/memory_safe_run
+
+# OS files
+.DS_Store
+Thumbs.db
