@@ -16,3 +16,10 @@ src/memory_safe_run
 # OS files
 .DS_Store
 Thumbs.db
+src/auth_service/venv/
+src/user_service/venv/
+src/transaction_service/venv/
+src/*/venv/
+**/__pycache__/
+*.pyc
+*.pyo
