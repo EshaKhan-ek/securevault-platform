@@ -1,0 +1,7 @@
+=== SCENARIO 1 COMPLETE ===
+Date: Wed Jun 10 07:28:52 PM EDT 2026
+Attack 1: alg:none → 401 Unauthorized
+Attack 2: HS256 Key-Confusion → 401 Unauthorized
+Attack 3: Role Tampering (role:admin) → 401 Unauthorized
+Finding: JWKS endpoint not exposed (404) — public key not leaked
+Verdict: JWT security PASSED all 3 attack vectors

@@ -1,0 +1,16 @@
+=== SCENARIO 4 COMPLETE ===
+Date: Wed Jun 10 08:09:56 PM EDT 2026
+
+Test 1: Topic enumeration without auth → SUCCESS (no auth required)
+Test 2: Unauthenticated produce to 'transactions' topic → SUCCESS (message injected)
+Test 3: Unauthenticated consume from 'transactions' topic → SUCCESS (message read back)
+Test 4: HMAC Replay — modified amount with fake HMAC → SUCCESS (injected and consumed)
+
+Both malicious messages confirmed in topic:
+  offset 0: {"transaction_id":"evil-txn-001","amount":99999,"from":"attacker"}
+  offset 1: {"transaction_id":"txn-001","amount":99999,"hmac":"abc123legitimate"}
+
+*** CRITICAL VULNERABILITY: Kafka has NO authentication configured ***
+MITRE ATT&CK: T1565 - Data Manipulation
+Required fix: Enable SASL_SSL + SCRAM-SHA-512 + ACLs on all topics
+

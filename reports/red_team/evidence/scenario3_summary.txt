@@ -1,0 +1,6 @@
+=== SCENARIO 3 SUMMARY ===
+Date: Wed Jun 10 07:44:55 PM EDT 2026
+
+Test 1: Negative Amount → 400 BLOCKED (input validation works)
+Test 2: Admin ABAC Bypass → 403 BLOCKED (ABAC works)
+Test 3: XSS in description → 200 ACCEPTED *** VULNERABILITY ***
