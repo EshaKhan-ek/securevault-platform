@@ -1,0 +1,96 @@
+name: DevSecOps Pipeline
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main]
+ 
+jobs:
+ 
+  # STAGE 1: SECRET DETECTION (INDEPENDENT)
+  secret-scan:
+    name: 'Stage 1 - Secret Detection'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+ 
+  # STAGE 2: SAST (INDEPENDENT)
+  sast:
+    name: 'Stage 2 - SAST Analysis'
+    runs-on: ubuntu-latest
+    needs: secret-scan
+    strategy:
+      matrix:
+        language: [python, javascript, c-cpp]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-and-quality
+      - uses: github/codeql-action/autobuild@v3
+      - uses: github/codeql-action/analyze@v3
+ 
+  # STAGE 3: CONTAINER SCAN (NEEDS MEMBER 1 DOCKERFILE)
+  container-scan:
+    name: 'Stage 3 - Build and Container Scan'
+    runs-on: ubuntu-latest
+    needs: sast
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker Image
+        run: docker build -t secure-banking/auth-service:${{ github.sha }} ./docker/auth-service/
+      - name: Trivy Image Scan
+        run: |
+          trivy image --severity HIGH,CRITICAL --exit-code 1 \
+            --format json --output reports/trivy/trivy-image-report.json \
+            secure-banking/auth-service:${{ github.sha }}
+ 
+  # STAGE 4: IAC SCAN (INDEPENDENT)
+  iac-scan:
+    name: 'Stage 4 - IaC Security Scan'
+    runs-on: ubuntu-latest
+    needs: sast
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Tools
+        run: pip install checkov
+      - name: Trivy Config Scan
+        run: trivy config --severity HIGH,CRITICAL iac/
+      - name: Checkov Scan
+        run: checkov -d iac/ --framework terraform,kubernetes
+ 
+  # STAGE 5: DAST (NEEDS MEMBER 2 API)
+  dast:
+    name: 'Stage 5 - DAST Scan'
+    runs-on: ubuntu-latest
+    needs: [container-scan, iac-scan]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - name: OWASP ZAP Scan
+        run: |
+          docker run -t owasp/zap2docker-stable zap-api-scan.py \
+            -t http://api-gateway:8080/openapi.json \
+            -f openapi -r api_scan_report.html \
+            --hook=/zap/auth_hook.py
+ 
+  # STAGE 6: DEPLOY (NEEDS ALL)
+  deploy:
+    name: 'Stage 6 - Deploy to Kubernetes'
+    runs-on: ubuntu-latest
+    needs: dast
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Helm Deploy
+        run: |
+          helm upgrade --install auth-service ./k8s/helm/auth-service \
+            --namespace auth-system \
+            --set image.tag=${{ github.sha }}

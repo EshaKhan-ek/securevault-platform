@@ -1,0 +1,104 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-non-root-user
+  annotations:
+    policies.kyverno.io/category: CIS Kubernetes Benchmark
+    policies.kyverno.io/severity: high
+spec:
+  validationFailureAction: Enforce
+  rules:
+    - name: check-non-root
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+      validate:
+        message: 'Containers must run as non-root (UID >= 1000)'
+        pattern:
+          spec:
+            securityContext:
+              runAsNonRoot: true
+              runAsUser: '>= 1000'
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-privileged-containers
+spec:
+  validationFailureAction: Enforce
+  rules:
+    - name: check-privileged
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+      validate:
+        message: 'Privileged containers not allowed'
+        pattern:
+          spec:
+            containers:
+              - securityContext:
+                  privileged: false
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-resource-limits
+spec:
+  validationFailureAction: Enforce
+  rules:
+    - name: check-limits
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+      validate:
+        message: 'CPU and memory limits required'
+        pattern:
+          spec:
+            containers:
+              - resources:
+                  limits:
+                    cpu: '?*'
+                    memory: '?*'
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-host-namespaces
+spec:
+  validationFailureAction: Enforce
+  rules:
+    - name: host-namespaces
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+      validate:
+        message: 'hostPID, hostIPC, hostNetwork not allowed'
+        pattern:
+          spec:
+            hostPID: false
+            hostIPC: false
+            hostNetwork: false
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-readonly-rootfs
+spec:
+  validationFailureAction: Enforce
+  rules:
+    - name: check-readonly
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+      validate:
+        message: 'Root filesystem must be read-only'
+        pattern:
+          spec:
+            containers:
+              - securityContext:
+                  readOnlyRootFilesystem: true

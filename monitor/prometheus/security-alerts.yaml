@@ -1,0 +1,47 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: security-alerts
+  namespace: monitoring
+  labels:
+    release: prometheus
+    release: prometheus-stack
+    app: kube-prometheus-stack
+    app.kubernetes.io/part-of: kube-prometheus-stack
+spec:
+  groups:
+    - name: security_alerts
+      rules:
+ 
+        - alert: HighFailedLoginRate
+          expr: rate(auth_failed_logins_total[5m]) > 10
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: 'Brute force attack detected'
+            description: 'Failed login rate > 10 per min'
+ 
+        - alert: ContainerRestarting
+          expr: rate(kube_pod_container_status_restarts_total[15m]) > 3
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: 'Container restarting frequently'
+ 
+        - alert: HighJWTRejectionRate
+          expr: rate(auth_jwt_rejected_total[5m]) > 5
+          for: 2m
+          labels:
+            severity: high
+          annotations:
+            summary: 'JWT manipulation attempt detected'
+ 
+        - alert: RateLimitTriggered
+          expr: rate(api_rate_limit_hits_total[5m]) > 20
+          for: 1m
+          labels:
+            severity: warning
+          annotations:
+            summary: 'API rate limiting triggered'

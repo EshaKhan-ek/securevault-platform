@@ -1,0 +1,529 @@
+{
+  "version": 4,
+  "terraform_version": "1.15.5",
+  "serial": 49,
+  "lineage": "71d5a1fe-9746-9ec4-8683-70a8acfec5e4",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "helm_release",
+      "name": "falco",
+      "provider": "provider[\"registry.terraform.io/hashicorp/helm\"]",
+      "instances": [
+        {
+          "schema_version": 2,
+          "attributes": {
+            "atomic": false,
+            "chart": "falco",
+            "cleanup_on_fail": false,
+            "create_namespace": false,
+            "dependency_update": false,
+            "description": "Upgrade \"falco\" failed: cannot patch \"falco\" with kind DaemonSet: Internal error occurred: failed calling webhook \"validate.kyverno.svc-fail\": failed to call webhook: Post \"https://kyverno-svc.security.svc:443/validate/fail?timeout=10s\": dial tcp 10.107.66.75:443: connect: connection refused",
+            "devel": null,
+            "disable_crd_hooks": false,
+            "disable_openapi_validation": false,
+            "disable_webhooks": false,
+            "force_update": false,
+            "id": "falco",
+            "keyring": null,
+            "lint": false,
+            "manifest": null,
+            "max_history": 0,
+            "metadata": {
+              "app_version": "0.44.0",
+              "chart": "falco",
+              "first_deployed": 1780341558,
+              "last_deployed": 1780343863,
+              "name": "falco",
+              "namespace": "monitoring",
+              "notes": "\n\nFalco agents are spinning up on each node in your cluster. After a few\nseconds, they are going to start monitoring your containers looking for\nsecurity issues.\n\nTIP:\nYou can easily forward Falco events to Slack, Kafka, AWS Lambda and more with falcosidekick.\nFull list of outputs: https://github.com/falcosecurity/charts/tree/master/charts/falcosidekick.\nYou can enable its deployment with `--set falcosidekick.enabled=true` or in your values.yaml.\nSee: https://github.com/falcosecurity/charts/blob/master/charts/falcosidekick/values.yaml for configuration values.",
+              "revision": 4,
+              "values": "{\"falco\":{\"jsonOutput\":true}}",
+              "version": "9.0.0"
+            },
+            "name": "falco",
+            "namespace": "monitoring",
+            "pass_credentials": false,
+            "postrender": null,
+            "recreate_pods": false,
+            "render_subchart_notes": true,
+            "replace": false,
+            "repository": null,
+            "repository_ca_file": null,
+            "repository_cert_file": null,
+            "repository_key_file": null,
+            "repository_password": null,
+            "repository_username": null,
+            "reset_values": false,
+            "resources": null,
+            "reuse_values": false,
+            "set": null,
+            "set_list": null,
+            "set_sensitive": null,
+            "set_wo": null,
+            "set_wo_revision": null,
+            "skip_crds": false,
+            "status": "failed",
+            "take_ownership": false,
+            "timeout": 300,
+            "timeouts": null,
+            "upgrade_install": false,
+            "values": null,
+            "verify": false,
+            "version": "9.0.0",
+            "wait": true,
+            "wait_for_jobs": false
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "repository_password"
+              }
+            ]
+          ],
+          "identity_schema_version": 0,
+          "identity": {
+            "namespace": "monitoring",
+            "release_name": "falco"
+          },
+          "dependencies": [
+            "kubernetes_namespace_v1.namespaces"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "helm_release",
+      "name": "kyverno",
+      "provider": "provider[\"registry.terraform.io/hashicorp/helm\"]",
+      "instances": [
+        {
+          "schema_version": 2,
+          "attributes": {
+            "atomic": false,
+            "chart": "kyverno",
+            "cleanup_on_fail": false,
+            "create_namespace": false,
+            "dependency_update": false,
+            "description": "Deletion in progress (or silently failed)",
+            "devel": null,
+            "disable_crd_hooks": false,
+            "disable_openapi_validation": false,
+            "disable_webhooks": false,
+            "force_update": false,
+            "id": "kyverno",
+            "keyring": null,
+            "lint": false,
+            "manifest": null,
+            "max_history": 0,
+            "metadata": {
+              "app_version": "v1.18.1",
+              "chart": "kyverno",
+              "first_deployed": 1780344307,
+              "last_deployed": 1780344307,
+              "name": "kyverno",
+              "namespace": "security",
+              "notes": "Chart version: 3.8.1\nKyverno version: v1.18.1\n\nThank you for installing kyverno! Your release is named kyverno.\n\nThe following components have been installed in your cluster:\n- CRDs\n- Admission controller\n- Reports controller\n- Cleanup controller\n- Background controller\n\n\n⚠️  WARNING: Setting the admission controller replica count below 2 means Kyverno is not running in high availability mode.\n\n\n⚠️  WARNING: PolicyExceptions are disabled by default. To enable them, set '--enablePolicyException' to true.\n\n💡 Note: There is a trade-off when deciding which approach to take regarding Namespace exclusions. Please see the documentation at https://kyverno.io/docs/installation/#security-vs-operability to understand the risks.\n",
+              "revision": 1,
+              "values": "{}",
+              "version": "3.8.1"
+            },
+            "name": "kyverno",
+            "namespace": "security",
+            "pass_credentials": false,
+            "postrender": null,
+            "recreate_pods": false,
+            "render_subchart_notes": true,
+            "replace": false,
+            "repository": null,
+            "repository_ca_file": null,
+            "repository_cert_file": null,
+            "repository_key_file": null,
+            "repository_password": null,
+            "repository_username": null,
+            "reset_values": false,
+            "resources": null,
+            "reuse_values": false,
+            "set": null,
+            "set_list": null,
+            "set_sensitive": null,
+            "set_wo": null,
+            "set_wo_revision": null,
+            "skip_crds": false,
+            "status": "deployed",
+            "take_ownership": false,
+            "timeout": 300,
+            "timeouts": null,
+            "upgrade_install": false,
+            "values": null,
+            "verify": false,
+            "version": "3.8.1",
+            "wait": true,
+            "wait_for_jobs": false
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "repository_password"
+              }
+            ]
+          ],
+          "identity_schema_version": 0,
+          "identity": {
+            "namespace": "security",
+            "release_name": "kyverno"
+          },
+          "dependencies": [
+            "kubernetes_namespace_v1.namespaces"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "helm_release",
+      "name": "prometheus",
+      "provider": "provider[\"registry.terraform.io/hashicorp/helm\"]",
+      "instances": [
+        {
+          "schema_version": 2,
+          "attributes": {
+            "atomic": false,
+            "chart": "kube-prometheus-stack",
+            "cleanup_on_fail": false,
+            "create_namespace": false,
+            "dependency_update": false,
+            "description": "Upgrade complete",
+            "devel": null,
+            "disable_crd_hooks": false,
+            "disable_openapi_validation": false,
+            "disable_webhooks": false,
+            "force_update": false,
+            "id": "prometheus",
+            "keyring": null,
+            "lint": false,
+            "manifest": null,
+            "max_history": 0,
+            "metadata": {
+              "app_version": "v0.91.0",
+              "chart": "kube-prometheus-stack",
+              "first_deployed": 1780341554,
+              "last_deployed": 1780343887,
+              "name": "prometheus",
+              "namespace": "monitoring",
+              "notes": "kube-state-metrics is a simple service that listens to the Kubernetes API server and generates metrics about the state of the objects.\nThe exposed metrics can be found here:\nhttps://github.com/kubernetes/kube-state-metrics/blob/master/docs/README.md#exposed-metrics\n\nThe metrics are exported on the HTTP endpoint /metrics on the listening port.\nIn your case, prometheus-kube-state-metrics.monitoring.svc.cluster.local:8080/metrics\n\nThey are served either as plaintext or protobuf depending on the Accept header.\nThey are designed to be consumed either by Prometheus itself or by a scraper that is compatible with scraping a Prometheus client endpoint.\n\nkube-prometheus-stack has been installed. Check its status by running:\n  kubectl --namespace monitoring get pods -l \"release=prometheus\"\n\nGet Grafana 'admin' user password by running:\n\n  kubectl --namespace monitoring get secrets prometheus-grafana -o jsonpath=\"{.data.admin-password}\" | base64 -d ; echo\n\nAccess Grafana local instance:\n\n  export POD_NAME=$(kubectl --namespace monitoring get pod -l \"app.kubernetes.io/name=grafana,app.kubernetes.io/instance=prometheus\" -oname)\n  kubectl --namespace monitoring port-forward $POD_NAME 3000\n\nGet your grafana admin user password by running:\n\n  kubectl get secret --namespace monitoring -l app.kubernetes.io/component=admin-secret -o jsonpath=\"{.items[0].data.admin-password}\" | base64 --decode ; echo\n\n\nVisit https://github.com/prometheus-operator/kube-prometheus for instructions on how to create \u0026 configure Alertmanager and Prometheus instances using the Operator.\n\n1. Get the application URL by running these commands:\n  export POD_NAME=$(kubectl get pods --namespace monitoring -l \"app.kubernetes.io/name=prometheus-node-exporter,app.kubernetes.io/instance=prometheus\" -o jsonpath=\"{.items[0].metadata.name}\")\n  echo \"Visit http://127.0.0.1:9100 to use your application\"\n  kubectl port-forward --namespace monitoring $POD_NAME 9100\n1. Get your 'admin' user password by running:\n\n   kubectl get secret --namespace monitoring prometheus-grafana -o jsonpath=\"{.data.admin-password}\" | base64 --decode ; echo\n\n\n2. The Grafana server can be accessed via port 80 on the following DNS name from within your cluster:\n\n   prometheus-grafana.monitoring.svc.cluster.local\n\n   Get the Grafana URL to visit by running these commands in the same shell:\n     export POD_NAME=$(kubectl get pods --namespace monitoring -l \"app.kubernetes.io/name=grafana,app.kubernetes.io/instance=prometheus\" -o jsonpath=\"{.items[0].metadata.name}\")\n     kubectl --namespace monitoring port-forward $POD_NAME 3000\n\n3. Login with the password from step 1 and the username: admin\n#################################################################################\n######   WARNING: Persistence is disabled!!! You will lose your data when   #####\n######            the Grafana pod is terminated.                            #####\n#################################################################################\n",
+              "revision": 3,
+              "values": "{}",
+              "version": "86.1.0"
+            },
+            "name": "prometheus",
+            "namespace": "monitoring",
+            "pass_credentials": false,
+            "postrender": null,
+            "recreate_pods": false,
+            "render_subchart_notes": true,
+            "replace": false,
+            "repository": null,
+            "repository_ca_file": null,
+            "repository_cert_file": null,
+            "repository_key_file": null,
+            "repository_password": null,
+            "repository_username": null,
+            "reset_values": false,
+            "resources": null,
+            "reuse_values": false,
+            "set": null,
+            "set_list": null,
+            "set_sensitive": null,
+            "set_wo": null,
+            "set_wo_revision": null,
+            "skip_crds": false,
+            "status": "failed",
+            "take_ownership": false,
+            "timeout": 300,
+            "timeouts": null,
+            "upgrade_install": false,
+            "values": null,
+            "verify": false,
+            "version": "86.1.0",
+            "wait": true,
+            "wait_for_jobs": false
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "repository_password"
+              }
+            ]
+          ],
+          "identity_schema_version": 0,
+          "identity": {
+            "namespace": "monitoring",
+            "release_name": "prometheus"
+          },
+          "dependencies": [
+            "kubernetes_namespace_v1.namespaces"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "helm_release",
+      "name": "vault",
+      "provider": "provider[\"registry.terraform.io/hashicorp/helm\"]",
+      "instances": [
+        {
+          "schema_version": 2,
+          "attributes": {
+            "atomic": false,
+            "chart": "vault",
+            "cleanup_on_fail": false,
+            "create_namespace": false,
+            "dependency_update": false,
+            "description": "Upgrade \"vault\" failed: cannot patch \"vault\" with kind StatefulSet: StatefulSet.apps \"vault\" is invalid: spec: Forbidden: updates to statefulset spec for fields other than 'replicas', 'ordinals', 'template', 'updateStrategy', 'revisionHistoryLimit', 'persistentVolumeClaimRetentionPolicy' and 'minReadySeconds' are forbidden",
+            "devel": null,
+            "disable_crd_hooks": false,
+            "disable_openapi_validation": false,
+            "disable_webhooks": false,
+            "force_update": false,
+            "id": "vault",
+            "keyring": null,
+            "lint": false,
+            "manifest": null,
+            "max_history": 0,
+            "metadata": {
+              "app_version": "1.21.2",
+              "chart": "vault",
+              "first_deployed": 1780344287,
+              "last_deployed": 1780344287,
+              "name": "vault",
+              "namespace": "security",
+              "notes": "\nThank you for installing HashiCorp Vault!\n\nNow that you have deployed Vault, you should look over the docs on using\nVault with Kubernetes available here:\n\nhttps://developer.hashicorp.com/vault/docs\n\n\nYour release is named vault. To learn more about the release, try:\n\n  $ helm status vault\n  $ helm get manifest vault\n\n",
+              "revision": 1,
+              "values": "{\"server\":{\"dev\":{\"enabled\":true},\"ha\":{\"enabled\":false}}}",
+              "version": "0.32.0"
+            },
+            "name": "vault",
+            "namespace": "security",
+            "pass_credentials": false,
+            "postrender": null,
+            "recreate_pods": false,
+            "render_subchart_notes": true,
+            "replace": false,
+            "repository": null,
+            "repository_ca_file": null,
+            "repository_cert_file": null,
+            "repository_key_file": null,
+            "repository_password": null,
+            "repository_username": null,
+            "reset_values": false,
+            "resources": null,
+            "reuse_values": false,
+            "set": null,
+            "set_list": null,
+            "set_sensitive": null,
+            "set_wo": null,
+            "set_wo_revision": null,
+            "skip_crds": false,
+            "status": "deployed",
+            "take_ownership": false,
+            "timeout": 300,
+            "timeouts": null,
+            "upgrade_install": false,
+            "values": null,
+            "verify": false,
+            "version": "0.32.0",
+            "wait": true,
+            "wait_for_jobs": false
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "repository_password"
+              }
+            ]
+          ],
+          "identity_schema_version": 0,
+          "identity": {
+            "namespace": "security",
+            "release_name": "vault"
+          },
+          "dependencies": [
+            "kubernetes_namespace_v1.namespaces"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "kubernetes_namespace_v1",
+      "name": "namespaces",
+      "provider": "provider[\"registry.terraform.io/hashicorp/kubernetes\"]",
+      "instances": [
+        {
+          "index_key": "app-system",
+          "schema_version": 0,
+          "attributes": {
+            "id": "app-system",
+            "metadata": [
+              {
+                "annotations": {},
+                "generate_name": "",
+                "generation": 0,
+                "labels": {
+                  "managed-by": "terraform",
+                  "pod-security.kubernetes.io/enforce": "restricted"
+                },
+                "name": "app-system",
+                "resource_version": "1059",
+                "uid": "14a34fbd-dd10-48c1-a54d-3afd8fb176d1"
+              }
+            ],
+            "timeouts": null,
+            "wait_for_default_service_account": false
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 1,
+          "identity": {
+            "api_version": "v1",
+            "kind": "Namespace",
+            "name": "app-system"
+          },
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiZGVsZXRlIjozMDAwMDAwMDAwMDB9fQ=="
+        },
+        {
+          "index_key": "auth-system",
+          "schema_version": 0,
+          "attributes": {
+            "id": "auth-system",
+            "metadata": [
+              {
+                "annotations": {},
+                "generate_name": "",
+                "generation": 0,
+                "labels": {
+                  "managed-by": "terraform",
+                  "pod-security.kubernetes.io/enforce": "restricted"
+                },
+                "name": "auth-system",
+                "resource_version": "1056",
+                "uid": "1e12c256-8447-4ce0-bef2-8301f42f687a"
+              }
+            ],
+            "timeouts": null,
+            "wait_for_default_service_account": false
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 1,
+          "identity": {
+            "api_version": "v1",
+            "kind": "Namespace",
+            "name": "auth-system"
+          },
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiZGVsZXRlIjozMDAwMDAwMDAwMDB9fQ=="
+        },
+        {
+          "index_key": "data-system",
+          "schema_version": 0,
+          "attributes": {
+            "id": "data-system",
+            "metadata": [
+              {
+                "annotations": {},
+                "generate_name": "",
+                "generation": 0,
+                "labels": {
+                  "managed-by": "terraform",
+                  "pod-security.kubernetes.io/enforce": "restricted"
+                },
+                "name": "data-system",
+                "resource_version": "1061",
+                "uid": "d52c5616-68a3-4fe9-bd96-963ecb352382"
+              }
+            ],
+            "timeouts": null,
+            "wait_for_default_service_account": false
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 1,
+          "identity": {
+            "api_version": "v1",
+            "kind": "Namespace",
+            "name": "data-system"
+          },
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiZGVsZXRlIjozMDAwMDAwMDAwMDB9fQ=="
+        },
+        {
+          "index_key": "monitoring",
+          "schema_version": 0,
+          "attributes": {
+            "id": "monitoring",
+            "metadata": [
+              {
+                "annotations": {},
+                "generate_name": "",
+                "generation": 0,
+                "labels": {
+                  "managed-by": "terraform",
+                  "pod-security.kubernetes.io/enforce": "restricted"
+                },
+                "name": "monitoring",
+                "resource_version": "1062",
+                "uid": "6c0bcdef-a84f-45f2-aead-69d7313c531a"
+              }
+            ],
+            "timeouts": null,
+            "wait_for_default_service_account": false
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 1,
+          "identity": {
+            "api_version": "v1",
+            "kind": "Namespace",
+            "name": "monitoring"
+          },
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiZGVsZXRlIjozMDAwMDAwMDAwMDB9fQ=="
+        },
+        {
+          "index_key": "security",
+          "schema_version": 0,
+          "attributes": {
+            "id": "security",
+            "metadata": [
+              {
+                "annotations": {},
+                "generate_name": "",
+                "generation": 0,
+                "labels": {
+                  "managed-by": "terraform",
+                  "pod-security.kubernetes.io/enforce": "restricted"
+                },
+                "name": "security",
+                "resource_version": "1065",
+                "uid": "9bc4c806-2edf-4be1-a7a5-103e38ab6ace"
+              }
+            ],
+            "timeouts": null,
+            "wait_for_default_service_account": false
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 1,
+          "identity": {
+            "api_version": "v1",
+            "kind": "Namespace",
+            "name": "security"
+          },
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiZGVsZXRlIjozMDAwMDAwMDAwMDB9fQ=="
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}
