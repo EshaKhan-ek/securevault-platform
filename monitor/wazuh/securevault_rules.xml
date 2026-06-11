@@ -1,0 +1,53 @@
+<group name="securevault">
+
+  <!-- R-01: Brute Force Login Detection -->
+  <rule id="100101" level="10">
+    <match>Invalid username or password</match>
+    <description>SecureVault R-01: Brute force login - repeated failures detected</description>
+    <group>authentication_failures,brute_force,securevault</group>
+    <mitre>
+      <id>T1110</id>
+    </mitre>
+  </rule>
+
+  <!-- R-02: Container Anomaly from Falco -->
+  <rule id="100102" level="15">
+   <decoded_as>json</decoded_as>
+   <field name="priority">HIGH</field>
+   <description>SecureVault R-02: Falco container anomaly detected</description>
+   <group>container_security,falco,securevault</group>
+  </rule>
+
+  <!-- R-03: ML Anomaly + Auth Failure Correlation -->
+  <rule id="100103" level="15">
+    <match>anomaly_detected</match>
+    <description>SecureVault R-03: ML anomaly correlated with auth failures</description>
+    <group>ml_anomaly,authentication_failures,securevault</group>
+    <mitre>
+      <id>T1078</id>
+      <id>T1110</id>
+    </mitre>
+  </rule>
+
+  <!-- R-04: Kafka Unauthorized Access -->
+  <rule id="100104" level="12">
+    <match>AUTHENTICATION_FAILED|AUTHORIZATION</match>
+    <description>SecureVault R-04: Kafka ACL bypass detected</description>
+    <group>kafka,authentication_failures,securevault</group>
+    <mitre>
+      <id>T1565</id>
+    </mitre>
+  </rule>
+
+  <!-- R-05: JWT Manipulation Detection -->
+  <rule id="100105" level="12">
+    <match>Invalid or expired token</match>
+    <description>SecureVault R-05: JWT manipulation detected</description>
+    <group>jwt,authentication_failures,securevault</group>
+    <mitre>
+      <id>T1134</id>
+      <id>T1078</id>
+    </mitre>
+  </rule>
+
+</group>
