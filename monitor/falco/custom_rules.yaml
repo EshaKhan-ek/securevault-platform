@@ -1,16 +1,16 @@
+- rule: SecureVault Container Shell Spawned
+  desc: Detect any shell spawned inside SecureVault production containers
+  condition: spawned_process and container and proc.name in (bash, sh, zsh, dash, ksh) and container.name != ""
+  output: "CRITICAL Shell spawned inside container (user=%user.name proc=%proc.name pid=%proc.pid container=%container.name image=%container.image.repository)"
+  priority: CRITICAL
+  tags: [container, shell, T1059]
+
 - rule: SecureVault Unauthorized Write to /etc
   desc: Detect file write attempts to /etc inside containers
   condition: open_write and container and fd.name startswith /etc
   output: "HIGH Unauthorized write to /etc in container (user=%user.name file=%fd.name proc=%proc.name container=%container.name)"
   priority: WARNING
   tags: [container, filesystem, T1222]
-
-- rule: SecureVault Suspicious Bash Activity
-  desc: Detect any bash execution inside containers (custom demo rule)
-  condition: evt.type=execve and container and proc.name=bash
-  output: "CRITICAL Suspicious bash execution (user=%user.name proc=%proc.name container=%container.name)"
-  priority: CRITICAL
-  tags: [container, shell, demo]
 
 - rule: SecureVault Crypto Mining Detected
   desc: Detect crypto mining processes inside containers
