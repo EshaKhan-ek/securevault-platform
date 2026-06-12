@@ -1,21 +1,25 @@
 <group name="securevault">
 
   <!-- R-01: Brute Force Login Detection -->
-  <rule id="100101" level="10">
-    <match>Invalid username or password</match>
-    <description>SecureVault R-01: Brute force login - repeated failures detected</description>
-    <group>authentication_failures,brute_force,securevault</group>
-    <mitre>
-      <id>T1110</id>
-    </mitre>
+  <rule id="100101" level="10" frequency="5" timeframe="120">
+   <if_matched_sid>5503</if_matched_sid>
+   <same_source_ip />
+   <description>SecureVault R-01: Brute force - 5+ login failures in 2 min from same IP</description>
+   <group>brute_force,authentication_failures,securevault</group>
+   <mitre>
+     <id>T1110</id>
+   </mitre>
   </rule>
 
-  <!-- R-02: Container Anomaly from Falco -->
+  <!-- R-02: Container Anomaly Detection -->
   <rule id="100102" level="15">
-   <decoded_as>json</decoded_as>
-   <field name="priority">HIGH</field>
-   <description>SecureVault R-02: Falco container anomaly detected</description>
+   <if_sid>5503</if_sid>
+   <match>container</match>
+   <description>SecureVault R-02: Container anomaly detected - suspicious activity</description>
    <group>container_security,falco,securevault</group>
+   <mitre>
+     <id>T1611</id>
+   </mitre>
   </rule>
 
   <!-- R-03: ML Anomaly + Auth Failure Correlation -->
