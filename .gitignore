@@ -16,3 +16,4 @@ src/memory_safe_run
 # OS files
 .DS_Store
 Thumbs.db
+*.tar
