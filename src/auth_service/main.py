@@ -1,7 +1,8 @@
 from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.middleware.cors import CORSMiddleware
 import redis
-import time
+import os
 from models import UserRegister, UserLogin, TokenResponse
 from security import hash_password, verify_password, create_access_token, decode_token
 from database import get_user, create_user, user_exists
@@ -12,9 +13,10 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Redis for rate limiting
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+
 try:
-    r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+    r = redis.Redis(host=os.environ.get('REDIS_HOST', 'localhost'), port=6379, db=0, decode_responses=True)
     r.ping()
     REDIS_AVAILABLE = True
 except:
@@ -28,10 +30,7 @@ def rate_limit_check(ip: str):
     key = f"login_attempts:{ip}"
     attempts = r.get(key)
     if attempts and int(attempts) >= 5:
-        raise HTTPException(
-            status_code=429,
-            detail="Too many login attempts. Try again in 60 seconds."
-        )
+        raise HTTPException(status_code=429, detail="Too many login attempts. Try again in 60 seconds.")
 
 def record_failed_attempt(ip: str):
     if not REDIS_AVAILABLE:
@@ -78,5 +77,4 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
 
 @app.post("/auth/logout")
 def logout():
-    # Stateless JWT - client discards token
     return {"message": "Logged out successfully"}

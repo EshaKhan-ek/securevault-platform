@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: securevault-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: docker/auth/Dockerfile
+    container_name: securevault-auth
+    ports:
+      - "8001:8001"
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    restart: unless-stopped
+
+  user-service:
+    build:
+      context: .
+      dockerfile: docker/user/Dockerfile
+    container_name: securevault-user
+    ports:
+      - "8002:8002"
+    depends_on:
+      - auth-service
+    restart: unless-stopped
+
+  transaction-service:
+    build:
+      context: .
+      dockerfile: docker/transaction/Dockerfile
+    container_name: securevault-transaction
+    ports:
+      - "8003:8003"
+    depends_on:
+      - auth-service
+    restart: unless-stopped

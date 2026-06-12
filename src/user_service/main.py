@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from dependencies import get_current_user, require_admin
 
 app = FastAPI(
@@ -7,9 +8,11 @@ app = FastAPI(
     version="1.0.0"
 )
 
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+
 users_db = {
     "admin": {"username": "admin", "role": "admin", "balance": 99999.0},
-    "esha": {"username": "esha", "role": "customer", "balance": 1000.0}
+    "esha":  {"username": "esha",  "role": "customer", "balance": 1000.0}
 }
 
 @app.get("/health")
