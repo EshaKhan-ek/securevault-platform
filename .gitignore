@@ -16,3 +16,5 @@ src/memory_safe_run
 # OS files
 .DS_Store
 Thumbs.db
+wazuh-install-files.tar
+wazuh-install.sh
