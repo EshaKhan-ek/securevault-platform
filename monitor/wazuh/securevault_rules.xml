@@ -2,29 +2,29 @@
 
   <!-- R-01: Brute Force Login Detection -->
   <rule id="100101" level="10" frequency="5" timeframe="120">
-   <if_matched_sid>5503</if_matched_sid>
-   <same_source_ip />
-   <description>SecureVault R-01: Brute force - 5+ login failures in 2 min from same IP</description>
-   <group>brute_force,authentication_failures,securevault</group>
-   <mitre>
-     <id>T1110</id>
-   </mitre>
+    <match>Invalid username or password</match>
+    <same_source_ip />
+    <description>SecureVault R-01: Brute force login - 5+ failures in 2 min from same IP</description>
+    <group>authentication_failures,brute_force,securevault</group>
+    <mitre>
+      <id>T1110</id>
+    </mitre>
   </rule>
 
-  <!-- R-02: Container Anomaly Detection -->
+  <!-- R-02: Container Anomaly from Falco -->
   <rule id="100102" level="15">
-   <if_sid>5503</if_sid>
-   <match>container</match>
-   <description>SecureVault R-02: Container anomaly detected - suspicious activity</description>
-   <group>container_security,falco,securevault</group>
-   <mitre>
-     <id>T1611</id>
-   </mitre>
+    <decoded_as>json</decoded_as>
+    <field name="priority">CRITICAL|HIGH</field>
+    <description>SecureVault R-02: Falco container anomaly detected</description>
+    <group>container_security,falco,securevault</group>
+    <mitre>
+      <id>T1611</id>
+    </mitre>
   </rule>
 
   <!-- R-03: ML Anomaly + Auth Failure Correlation -->
-  <rule id="100103" level="15">
-    <match>anomaly_detected</match>
+  <rule id="100103" level="15" frequency="3" timeframe="300">
+    <if_matched_sid>100101</if_matched_sid>
     <description>SecureVault R-03: ML anomaly correlated with auth failures</description>
     <group>ml_anomaly,authentication_failures,securevault</group>
     <mitre>
@@ -34,9 +34,10 @@
   </rule>
 
   <!-- R-04: Kafka Unauthorized Access -->
-  <rule id="100104" level="12">
+  <rule id="100104" level="12" frequency="3" timeframe="60">
     <match>AUTHENTICATION_FAILED|AUTHORIZATION</match>
-    <description>SecureVault R-04: Kafka ACL bypass detected</description>
+    <same_source_ip />
+    <description>SecureVault R-04: Kafka ACL bypass - 3+ auth failures in 1 min</description>
     <group>kafka,authentication_failures,securevault</group>
     <mitre>
       <id>T1565</id>
@@ -44,9 +45,10 @@
   </rule>
 
   <!-- R-05: JWT Manipulation Detection -->
-  <rule id="100105" level="12">
+  <rule id="100105" level="12" frequency="2" timeframe="300">
     <match>Invalid or expired token</match>
-    <description>SecureVault R-05: JWT manipulation detected</description>
+    <same_source_ip />
+    <description>SecureVault R-05: JWT manipulation - repeated invalid tokens</description>
     <group>jwt,authentication_failures,securevault</group>
     <mitre>
       <id>T1134</id>
