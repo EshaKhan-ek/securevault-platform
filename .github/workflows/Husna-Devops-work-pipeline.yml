@@ -44,7 +44,7 @@ jobs:
       - uses: github/codeql-action/autobuild@v3
       - uses: github/codeql-action/analyze@v3
 
-  # STAGE 3: CONTAINER SCAN (Aapka Exact Path Add Kar Diya Gaya Hai)
+  # STAGE 3: CONTAINER SCAN (Docker Build Context Fixed)
   container-scan:
     name: 'Stage 3 - Build and Container Scan'
     runs-on: ubuntu-latest
@@ -52,7 +52,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build Docker Image
-       run: docker build -f ./docker/auth/Dockerfile -t secure-banking/auth-service:${{ github.sha }} .
+        run: docker build -f ./docker/auth/Dockerfile -t secure-banking/auth-service:${{ github.sha }} .
       - name: Trivy Image Scan
         continue-on-error: true
         run: |
