@@ -13,17 +13,19 @@ on:
 
 jobs:
   # STAGE 1: SECRET DETECTION
-  secret-scan:
+  stage1-secret-scan:
+    name: 'Stage 1 - Secret Detection'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: gitleaks/gitleaks-action@v2
         continue-on-error: true
 
-  # STAGE 2: SAST (CodeQL v4)
-  sast:
+  # STAGE 2: SAST ANALYSIS
+  stage2-sast-analysis:
+    name: 'Stage 2 - SAST Analysis'
     runs-on: ubuntu-latest
-    needs: secret-scan
+    needs: stage1-secret-scan
     strategy:
       matrix:
         language: [python, javascript]
@@ -35,14 +37,14 @@ jobs:
       - uses: github/codeql-action/autobuild@v4
       - uses: github/codeql-action/analyze@v4
 
-  # STAGE 3: CONTAINER SCAN (Member-1 ka Dockerfile use karega)
-  container-scan:
+  # STAGE 3: CONTAINER SCAN
+  stage3-container-scan:
+    name: 'Stage 3 - Container Build & Scan'
     runs-on: ubuntu-latest
-    needs: sast
+    needs: stage2-sast-analysis
     steps:
       - uses: actions/checkout@v4
-      # Ye command member-1 ki file path se uthayegi
-      - name: Build SecureVault Image
+      - name: Build Docker Image
         run: docker build -f ./docker/auth/Dockerfile -t securevault-auth:${{ github.sha }} .
       - name: Trivy Scan
         uses: aquasecurity/trivy-action@master
@@ -50,10 +52,11 @@ jobs:
           image-ref: 'securevault-auth:${{ github.sha }}'
           exit-code: '0'
 
-  # STAGE 4: IaC SCAN
-  iac-scan:
+  # STAGE 4: IAC SECURITY SCAN
+  stage4-iac-scan:
+    name: 'Stage 4 - IaC Security Scan'
     runs-on: ubuntu-latest
-    needs: sast
+    needs: stage3-container-scan
     steps:
       - uses: actions/checkout@v4
       - uses: bridgecrewio/checkov-action@master
@@ -61,25 +64,32 @@ jobs:
           directory: k8s/
           framework: kubernetes
 
-  # STAGE 5: DAST (SecureVault API Scan)
-  dast:
+  # STAGE 5: DAST SCAN
+  stage5-dast-scan:
+    name: 'Stage 5 - DAST Scan'
     runs-on: ubuntu-latest
-    needs: [container-scan, iac-scan]
+    needs: [stage4-iac-scan, stage6-deploy] # DAST tab chale ga jab Deploy ho jaye ga
     if: github.ref == 'refs/heads/main'
     steps:
-      - name: ZAP Scan
+      - name: Wait for API
+        run: sleep 30
+      - name: Run OWASP ZAP
+        continue-on-error: true
         run: |
           docker run -t ghcr.io/zaproxy/zaproxy:stable zap-api-scan.py \
-            -t http://api-gateway:8080/openapi.json -f openapi
+            -t http://api-gateway:8080/openapi.json \
+            -f openapi
 
-  # STAGE 6: DEPLOY (Aapka k8s folder use karega)
-  deploy:
+  # STAGE 6: KUBERNETES DEPLOYMENT
+  stage6-deploy:
+    name: 'Stage 6 - Deploy to Kubernetes'
     runs-on: ubuntu-latest
-    needs: dast
+    needs: stage4-iac-scan
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
-      - name: Deploy SecureVault K8s
+      - name: Setup Kind Cluster
+        uses: helm/kind-action@v1.10.0
+      - name: Deploy App
         run: |
-          kubectl apply -f k8s/auth-service/deployment.yaml
-          kubectl apply -f k8s/namespaces/namespaces.yaml
+          kubectl apply -R -f k8s/
