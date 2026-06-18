@@ -1,4 +1,8 @@
 name: DevSecOps Pipeline
+permissions:
+  actions: read
+  contents: read
+  security-events: write
 on:
   push:
     branches: ['**']
