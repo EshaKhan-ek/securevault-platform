@@ -12,7 +12,9 @@ on:
     branches: [main]
 
 jobs:
+  # ==========================================
   # STAGE 1: SECRET DETECTION
+  # ==========================================
   stage1-secret-scan:
     name: 'Stage 1 - Secret Detection'
     runs-on: ubuntu-latest
@@ -21,7 +23,9 @@ jobs:
       - uses: gitleaks/gitleaks-action@v2
         continue-on-error: true
 
+  # ==========================================
   # STAGE 2: SAST ANALYSIS
+  # ==========================================
   stage2-sast-analysis:
     name: 'Stage 2 - SAST Analysis'
     runs-on: ubuntu-latest
@@ -37,7 +41,9 @@ jobs:
       - uses: github/codeql-action/autobuild@v4
       - uses: github/codeql-action/analyze@v4
 
+  # ==========================================
   # STAGE 3: CONTAINER SCAN
+  # ==========================================
   stage3-container-scan:
     name: 'Stage 3 - Container Build & Scan'
     runs-on: ubuntu-latest
@@ -53,7 +59,9 @@ jobs:
           image-ref: 'securevault-auth:${{ github.sha }}'
           exit-code: '0'
 
+  # ==========================================
   # STAGE 4: IAC SECURITY SCAN
+  # ==========================================
   stage4-iac-scan:
     name: 'Stage 4 - IaC Security Scan'
     runs-on: ubuntu-latest
@@ -64,41 +72,60 @@ jobs:
         uses: bridgecrewio/checkov-action@master
         continue-on-error: true
         with:
-          # Directory '.' kar di hai taake folder na milne par crash na ho
           directory: . 
           framework: kubernetes
 
-  # STAGE 6: KUBERNETES DEPLOYMENT (Pehle yeh chalega)
-  stage6-deploy:
-    name: 'Stage 6 - Deploy to Kubernetes'
+  # ==========================================
+  # STAGE 5: KUBERNETES DEPLOYMENT & VERIFY
+  # ==========================================
+  stage5-deploy:
+    name: 'Stage 5 - Deploy to Kubernetes'
     runs-on: ubuntu-latest
     needs: stage4-iac-scan
-    # Yahan se 'if: main' hata diya hai taake PR mein bhi chale
     steps:
       - uses: actions/checkout@v4
       - name: Setup Kind Cluster
         uses: helm/kind-action@v1.10.0
-      - name: Deploy App
-        # Folder check wapis add kar diya hai
+      - name: Apply K8s Manifests
         run: |
           if [ -d "k8s" ]; then
+            echo "k8s folder found, deploying..."
             kubectl apply -R -f k8s/
+            echo "Waiting 30 seconds for Pods to wake up..."
+            sleep 30
           else
             echo "k8s folder not found, skipping deployment."
           fi
+          
+      - name: 📊 View Live Cluster Status
+        run: |
+          echo "======================================"
+          echo "      KUBERNETES PODS STATUS          "
+          echo "======================================"
+          kubectl get pods -A
+          echo ""
+          echo "======================================"
+          echo "    SERVICES & MONITORING (Grafana)   "
+          echo "======================================"
+          kubectl get svc -A
 
-  # STAGE 5: DAST SCAN (Deploy hone ke baad chalega)
-  stage5-dast-scan:
-    name: 'Stage 5 - DAST Scan'
+  # ==========================================
+  # STAGE 6: DAST SCAN (Runs after Deploy)
+  # ==========================================
+  stage6-dast-scan:
+    name: 'Stage 6 - DAST Scan'
     runs-on: ubuntu-latest
-    needs: stage6-deploy 
-    # Yahan se bhi 'if: main' hata diya hai
+    needs: stage5-deploy 
     steps:
-      - name: Wait for API
-        run: sleep 30
+      - name: Expose Service for ZAP
+        continue-on-error: true
+        run: |
+          # DAST ke liye port forward kar rahe hain taake API ZAP ko mil sake
+          kubectl port-forward svc/api-gateway 8080:8080 -n default &
+          sleep 10
       - name: Run OWASP ZAP
         continue-on-error: true
         run: |
-          docker run -t ghcr.io/zaproxy/zaproxy:stable zap-api-scan.py \
-            -t http://api-gateway:8080/openapi.json \
+          docker run --network host -t ghcr.io/zaproxy/zaproxy:stable zap-api-scan.py \
+            -t http://localhost:8080/openapi.json \
             -f openapi
