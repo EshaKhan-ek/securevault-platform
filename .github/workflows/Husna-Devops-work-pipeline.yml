@@ -42,7 +42,7 @@ jobs:
       - uses: github/codeql-action/analyze@v4
 
   # ==========================================
-  # STAGE 3: CONTAINER SCAN
+  # STAGE 3: CONTAINER SCAN (Building Auth Service)
   # ==========================================
   stage3-container-scan:
     name: 'Stage 3 - Container Build & Scan'
@@ -50,14 +50,23 @@ jobs:
     needs: stage2-sast-analysis
     steps:
       - uses: actions/checkout@v4
-      - name: Build Docker Image
+      - name: Build Auth Docker Image
         run: docker build -f ./docker/auth/Dockerfile -t securevault-auth:${{ github.sha }} .
+      
       - name: Trivy Scan
         uses: aquasecurity/trivy-action@master
         continue-on-error: true
         with:
           image-ref: 'securevault-auth:${{ github.sha }}'
+          format: 'json'
+          output: 'trivy-report.json'
           exit-code: '0'
+          
+      - name: Upload Trivy Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-security-report
+          path: trivy-report.json
 
   # ==========================================
   # STAGE 4: IAC SECURITY SCAN
@@ -76,56 +85,79 @@ jobs:
           framework: kubernetes
 
   # ==========================================
-  # STAGE 5: KUBERNETES DEPLOYMENT & VERIFY
+  # STAGE 5: KUBERNETES DEPLOYMENT & MONITORING
   # ==========================================
   stage5-deploy:
-    name: 'Stage 5 - Deploy to Kubernetes'
+    name: 'Stage 5 - Deploy & Setup Monitoring'
     runs-on: ubuntu-latest
     needs: stage4-iac-scan
     steps:
       - uses: actions/checkout@v4
       - name: Setup Kind Cluster
         uses: helm/kind-action@v1.10.0
-      - name: Apply K8s Manifests
+        
+      # 🔥 NAYA STEP: Grafana aur Prometheus ko Khud Deploy Karega 🔥
+      - name: Install Prometheus & Grafana (Official Stack)
+        run: |
+          echo "Downloading and Installing Prometheus & Grafana..."
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo update
+          helm install kube-mon prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace
+          echo "Waiting 30 seconds for Monitoring servers to boot up..."
+          sleep 30
+          
+      - name: Apply Custom K8s Manifests
         run: |
           if [ -d "k8s" ]; then
-            echo "k8s folder found, deploying..."
+            echo "Applying your custom k8s folder configurations..."
             kubectl apply -R -f k8s/
-            echo "Waiting 30 seconds for Pods to wake up..."
-            sleep 30
+            sleep 20
           else
-            echo "k8s folder not found, skipping deployment."
+            echo "k8s folder not found, skipping custom manifests."
           fi
           
       - name: 📊 View Live Cluster Status
         run: |
           echo "======================================"
-          echo "      KUBERNETES PODS STATUS          "
+          echo " 📊 GRAFANA & PROMETHEUS SPECIFIC CHECK"
           echo "======================================"
-          kubectl get pods -A
+          # Yeh sirf monitoring walay pods dikhayega jo Helm ne banaye hain
+          kubectl get pods -n monitoring
+          
           echo ""
           echo "======================================"
-          echo "    SERVICES & MONITORING (Grafana)   "
+          echo "      ALL OTHER KUBERNETES PODS       "
           echo "======================================"
-          kubectl get svc -A
+          kubectl get pods -A
 
   # ==========================================
-  # STAGE 6: DAST SCAN (Runs after Deploy)
+  # STAGE 6: DAST SCAN (Using Docker Compose!)
   # ==========================================
   stage6-dast-scan:
-    name: 'Stage 6 - DAST Scan'
+    name: 'Stage 6 - DAST Scan (Live App)'
     runs-on: ubuntu-latest
     needs: stage5-deploy 
     steps:
-      - name: Expose Service for ZAP
+      - uses: actions/checkout@v4
+      
+      - name: Start SecureVault via Docker Compose
+        run: |
+          docker-compose up -d --build
+          echo "Waiting 30 seconds for all microservices to start..."
+          sleep 30
+          docker ps
+          
+      - name: Run OWASP ZAP on Auth Service
         continue-on-error: true
         run: |
-          # DAST ke liye port forward kar rahe hain taake API ZAP ko mil sake
-          kubectl port-forward svc/api-gateway 8080:8080 -n default &
-          sleep 10
-      - name: Run OWASP ZAP
-        continue-on-error: true
-        run: |
-          docker run --network host -t ghcr.io/zaproxy/zaproxy:stable zap-api-scan.py \
-            -t http://localhost:8080/openapi.json \
-            -f openapi
+          chmod 777 ${{ github.workspace }}
+          docker run --network host -v ${{ github.workspace }}:/zap/wrk/:rw -t ghcr.io/zaproxy/zaproxy:stable zap-api-scan.py \
+            -t http://localhost:8001/openapi.json \
+            -f openapi \
+            -r zap-report.html
+            
+      - name: Upload ZAP Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-dast-report
+          path: zap-report.html
