@@ -20,6 +20,12 @@ services:
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - DB_PATH=/app/data/auth.db
+      - FRONTEND_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+    volumes:
+      - auth_db:/app/data
+      - ./src/auth_service/private.pem:/app/private.pem:ro
+      - ./src/auth_service/public.pem:/app/public.pem:ro
     restart: unless-stopped
 
   user-service:
@@ -31,6 +37,12 @@ services:
       - "8002:8002"
     depends_on:
       - auth-service
+    environment:
+      - DB_PATH=/app/data/user.db
+      - FRONTEND_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+    volumes:
+      - user_db:/app/data
+      - ./src/auth_service/public.pem:/auth_service/public.pem:ro
     restart: unless-stopped
 
   transaction-service:
@@ -42,4 +54,15 @@ services:
       - "8003:8003"
     depends_on:
       - auth-service
+    environment:
+      - DB_PATH=/app/data/transaction.db
+      - FRONTEND_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+    volumes:
+      - transaction_db:/app/data
+      - ./src/auth_service/public.pem:/auth_service/public.pem:ro
     restart: unless-stopped
+
+volumes:
+  auth_db:
+  user_db:
+  transaction_db:

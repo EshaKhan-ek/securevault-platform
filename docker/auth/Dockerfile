@@ -13,9 +13,7 @@ COPY src/auth_service/main.py .
 COPY src/auth_service/models.py .
 COPY src/auth_service/security.py .
 COPY src/auth_service/database.py .
-COPY src/auth_service/private.pem .
-COPY src/auth_service/public.pem .
-RUN chown appuser:appuser private.pem public.pem && chmod 400 private.pem && chmod 644 public.pem
+RUN mkdir -p /app/data && chown appuser:appuser /app/data
 USER appuser
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD python3 -c "import urllib.request; urllib.request.urlopen('http://localhost:8001/health')" || exit 1

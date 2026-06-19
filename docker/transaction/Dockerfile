@@ -12,7 +12,7 @@ COPY --from=builder /usr/local/bin/uvicorn /usr/local/bin/uvicorn
 COPY src/transaction_service/main.py .
 COPY src/transaction_service/models.py .
 COPY src/transaction_service/dependencies.py .
-COPY src/auth_service/public.pem /auth_service/public.pem
+RUN mkdir -p /app/data && chown appuser:appuser /app/data
 USER appuser
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD python3 -c "import urllib.request; urllib.request.urlopen('http://localhost:8003/health')" || exit 1
