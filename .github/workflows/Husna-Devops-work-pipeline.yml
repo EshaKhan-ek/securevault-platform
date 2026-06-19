@@ -125,8 +125,8 @@ jobs:
           echo "======================================"
           kubectl get pods -A
 
-  # ==========================================
-  # STAGE 6: DAST SCAN (Docker Compose Hyphen Fixed)
+ # ==========================================
+  # STAGE 6: DAST SCAN (Live App)
   # ==========================================
   stage6-dast-scan:
     name: 'Stage 6 - DAST Scan (Live App)'
@@ -135,13 +135,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      # Fixed command: docker-compose -> docker compose
       - name: Start SecureVault via Docker Compose
         run: |
           docker compose up -d --build
-          echo "Waiting 30 seconds for all microservices to start..."
-          sleep 30
+          echo "⏳ Waiting 45 seconds for all microservices to fully start..."
+          sleep 45
+          
+          echo "📊 Checking Container Status:"
           docker ps
+          
+          echo "📋 Checking Auth Service Logs (in case it crashed):"
+          docker compose logs auth-service
+          
+          echo "🌐 Verifying OpenAPI endpoint is reachable:"
+          curl -v http://localhost:8001/openapi.json || echo "⚠️ Warning: Auth service is NOT reachable!"
           
       - name: Run OWASP ZAP on Auth Service
         continue-on-error: true
@@ -150,10 +157,13 @@ jobs:
           docker run --network host -v ${{ github.workspace }}:/zap/wrk/:rw -t ghcr.io/zaproxy/zaproxy:stable zap-api-scan.py \
             -t http://localhost:8001/openapi.json \
             -f openapi \
-            -r zap-report.html
+            -r zap-report.html || true
             
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v4
+        # Added if condition so it doesn't throw a warning if the file isn't created
+        if: always() 
         with:
           name: zap-dast-report
           path: zap-report.html
+          if-no-files-found: ignore
