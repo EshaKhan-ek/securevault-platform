@@ -7,13 +7,25 @@ from models import UserRegister, UserLogin, TokenResponse
 from security import hash_password, verify_password, create_access_token, decode_token
 from database import get_user, create_user, user_exists
 
+def get_allowed_origins():
+    origins = os.environ.get(
+        "FRONTEND_ORIGINS",
+        "http://localhost:3000,http://127.0.0.1:3000"
+    )
+    return [origin.strip() for origin in origins.split(",") if origin.strip()]
+
 app = FastAPI(
     title="SecureVault Bank - Auth Service",
     description="JWT RS256 Authentication with bcrypt and Redis rate limiting",
     version="1.0.0"
 )
 
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=get_allowed_origins(),
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 try:
     r = redis.Redis(host=os.environ.get('REDIS_HOST', 'localhost'), port=6379, db=0, decode_responses=True)

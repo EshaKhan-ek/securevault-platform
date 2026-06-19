@@ -1,7 +1,15 @@
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
+import os
 from dependencies import get_current_user, require_admin
 from database import get_user, create_user, get_all_users, init_db
+
+def get_allowed_origins():
+    origins = os.environ.get(
+        "FRONTEND_ORIGINS",
+        "http://localhost:3000,http://127.0.0.1:3000"
+    )
+    return [origin.strip() for origin in origins.split(",") if origin.strip()]
 
 app = FastAPI(
     title="SecureVault Bank - User Service",
@@ -9,7 +17,12 @@ app = FastAPI(
     version="1.0.0"
 )
 
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=get_allowed_origins(),
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 init_db()
 

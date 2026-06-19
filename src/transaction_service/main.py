@@ -78,13 +78,25 @@ def get_all_transactions_db():
     conn.close()
     return [dict(r) for r in rows]
 
+def get_allowed_origins():
+    origins = os.environ.get(
+        "FRONTEND_ORIGINS",
+        "http://localhost:3000,http://127.0.0.1:3000"
+    )
+    return [origin.strip() for origin in origins.split(",") if origin.strip()]
+
 app = FastAPI(
     title="SecureVault Bank - Transaction Service",
     description="Secure money transfers with input validation and ABAC",
     version="1.0.0"
 )
 
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=get_allowed_origins(),
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 init_db()
 
