@@ -1,0 +1,14 @@
+
+
+       _               _
+   ___| |__   ___  ___| | _______   __
+  / __| '_ \ / _ \/ __| |/ / _ \ \ / /
+ | (__| | | |  __/ (__|   < (_) \ V /
+  \___|_| |_|\___|\___|_|\_\___/ \_/
+
+By Prisma Cloud | version: 3.2.531 
+Update available 3.2.531 -> 3.3.1
+Run pip3 install -U checkov to update 
+
+
+Wrote output in SARIF format to the file 'results.sarif'

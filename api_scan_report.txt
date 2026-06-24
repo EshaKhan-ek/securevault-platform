@@ -1,0 +1,47 @@
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking localhost (be patient).....done
+
+
+Server Software:        uvicorn
+Server Hostname:        localhost
+Server Port:            8001
+
+Document Path:          /openapi.json
+Document Length:        3004 bytes
+
+Concurrency Level:      10
+Time taken for tests:   7.170 seconds
+Complete requests:      100
+Failed requests:        0
+Total transferred:      315000 bytes
+HTML transferred:       300400 bytes
+Requests per second:    13.95 [#/sec] (mean)
+Time per request:       717.004 [ms] (mean)
+Time per request:       71.700 [ms] (mean, across all concurrent requests)
+Transfer rate:          42.90 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    1   1.0      0       7
+Processing:   527  642  73.8    633    1248
+Waiting:       21  121  74.0    108     746
+Total:        528  642  73.8    634    1248
+
+Percentage of the requests served within a certain time (ms)
+  50%    634
+  66%    653
+  75%    666
+  80%    675
+  90%    691
+  95%    720
+  98%    728
+  99%   1248
+ 100%   1248 (longest request)
+- Nikto v2.5.0/
++ Target Host: localhost
++ Target Port: 8001
++ GET /openapi.json/: The anti-clickjacking X-Frame-Options header is not present. See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options: 
++ GET /openapi.json/: The X-Content-Type-Options header is not set. This could allow the user agent to render the content of the site in a different fashion to the MIME type. See: https://www.netsparker.com/web-vulnerability-scanner/vulnerabilities/missing-content-type-header/: 
