@@ -1,0 +1,10 @@
+=== BLUE TEAM SCENARIO 3 — Input Validation & Authorization ===
+Date: $(date)
+Test 1: Negative Amount → 400 BLOCKED (input validation already active)
+Test 2: ABAC Bypass → 403 BLOCKED (admin-only endpoint enforced)
+Test 3: XSS in description → 200 ACCEPTED — VULNERABILITY IDENTIFIED
+Finding: description field in /transactions/send does not sanitize HTML/JS input
+Recommended Fix: html.escape() or bleach.clean() in transaction_service/main.py
+Status: Remediation pending — not yet implemented
+Wazuh R-03: anomaly detection correlated with auth failures
+Verdict: 2/3 BLOCKED, 1 VULNERABILITY documented

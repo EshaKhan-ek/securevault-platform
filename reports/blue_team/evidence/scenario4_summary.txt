@@ -1,0 +1,9 @@
+=== BLUE TEAM SCENARIO 4 — Kafka ACL & Authentication ===
+Date: $(date)
+Context: Red team achieved full unauthenticated access — no SASL configured at time of attack
+Mitigation Applied: Kafka SASL authentication configured post red team engagement
+Test 1: Unauthenticated enumeration → BLOCKED after SASL enabled
+Test 2: Unauthenticated produce → BLOCKED — authentication required
+Test 3: HMAC Replay → BLOCKED — broker rejects unauthenticated producer
+Wazuh R-04: fires on 3+ Kafka auth failures within 1 minute
+Verdict: Kafka ACL bypass MITIGATED post engagement

@@ -1,0 +1,9 @@
+=== BLUE TEAM SCENARIO 1 — JWT Protection ===
+Date: $(date)
+Defense: RS256 enforcement already active before red team engagement
+Attack A: alg:none → blocked with HTTP 401
+Attack B: HS256 Key Confusion → blocked with HTTP 401
+Attack C: Role Tampering → blocked with HTTP 401
+Wazuh R-05: fires on 2+ repeated 401s from same IP
+Finding: JWKS endpoint not exposed (404) — secure design confirmed
+Verdict: JWT security PASSED all 3 attack vectors

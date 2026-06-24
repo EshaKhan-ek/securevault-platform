@@ -1,0 +1,11 @@
+=== BLUE TEAM SCENARIO 2 — Container Escape Mitigation ===
+Date: $(date)
+Context: Red team achieved full host escape — Kyverno not configured at time of attack
+Mitigation Applied: Kyverno ClusterPolicy deployed post red team engagement
+Policy 1: disallow-privileged-containers → blocks privileged:true
+Policy 2: disallow-host-namespaces → blocks hostPID, hostNetwork
+Policy 3: require-non-root-user → enforces runAsNonRoot
+Policy 4: require-readonly-rootfs → enforces readOnlyRootFilesystem
+Re-test: kubectl apply privileged pod → Kyverno policy violation — BLOCKED
+Falco: runtime monitoring active, CRITICAL alert fires on shell spawn and shadow read
+Verdict: Container escape MITIGATED post engagement
