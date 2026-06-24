@@ -1,0 +1,34 @@
+- rule: SecureVault Container Shell Spawned
+  desc: Detect any shell spawned inside SecureVault production containers
+  condition: spawned_process and container and proc.name in (bash, sh, zsh, dash, ksh) and container.name != ""
+  output: "CRITICAL Shell spawned inside container (user=%user.name proc=%proc.name pid=%proc.pid container=%container.name image=%container.image.repository)"
+  priority: CRITICAL
+  tags: [container, shell, T1059]
+
+- rule: SecureVault Unauthorized Write to /etc
+  desc: Detect file write attempts to /etc inside containers
+  condition: open_write and container and fd.name startswith /etc
+  output: "HIGH Unauthorized write to /etc in container (user=%user.name file=%fd.name proc=%proc.name container=%container.name)"
+  priority: WARNING
+  tags: [container, filesystem, T1222]
+
+- rule: SecureVault Crypto Mining Detected
+  desc: Detect crypto mining processes inside containers
+  condition: spawned_process and container and proc.name in (xmrig, minerd, cpuminer, ethminer, cryptonight, nbminer)
+  output: "CRITICAL Crypto miner detected inside container (user=%user.name proc=%proc.name container=%container.name)"
+  priority: CRITICAL
+  tags: [container, cryptomining, T1496]
+
+- rule: SecureVault Privilege Escalation to Root
+  desc: Detect privilege escalation attempts inside containers
+  condition: evt.type in (setuid, setreuid, setresuid) and container and evt.arg.uid = 0
+  output: "CRITICAL Privilege escalation to root in container (user=%user.name proc=%proc.name container=%container.name)"
+  priority: CRITICAL
+  tags: [container, privilege_escalation, T1068]
+
+- rule: SecureVault Sensitive File Access
+  desc: Detect reads of sensitive files inside containers
+  condition: open_read and container and fd.name in (/etc/shadow, /etc/passwd, /root/.ssh/id_rsa, /proc/1/environ, /var/run/secrets/kubernetes.io/serviceaccount/token)
+  output: "HIGH Sensitive file read inside container (user=%user.name file=%fd.name proc=%proc.name container=%container.name)"
+  priority: WARNING
+  tags: [container, credential_access, T1552]

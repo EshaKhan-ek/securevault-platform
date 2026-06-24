@@ -1,0 +1,13 @@
+=== SCENARIO 2 COMPLETE ===
+Date: Wed Jun 10 08:25:08 PM EDT 2026
+
+Test 1: Privileged pod deployed → SUCCESS (no Kyverno = no policy enforcement)
+Test 2: cat /proc/1/status → SUCCESS (host systemd visible = hostPID working)
+Test 3: nsenter --target 1 → SUCCESS (entered host namespaces)
+Test 4: CapPrm = 000001ffffffffff → FULL CAPABILITIES (not dropped)
+Test 5: cat /etc/shadow → SUCCESS (host shadow file read)
+
+*** CRITICAL: Full container escape achieved ***
+Root cause: Kyverno not installed, no Pod Security Standards enforced
+MITRE ATT&CK: T1611 - Escape to Host
+Required fix: Install Kyverno + enforce restricted Pod Security Standards
